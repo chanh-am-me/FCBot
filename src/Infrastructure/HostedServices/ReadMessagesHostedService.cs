@@ -21,8 +21,16 @@ public class ReadMessagesHostedService : BackgroundService
         ChannelConfig channel = ChannelConfig.Default;
         while (!stoppingToken.IsCancellationRequested)
         {
-            await engine.ReadLastedMessagesAsync(channel);
-            await Task.Delay(100, stoppingToken);
+            try
+            {
+                await engine.ReadLastedMessagesAsync(channel);
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync("Exception: " + ex.Message);
+            }
+
+            await Task.Delay(1000, stoppingToken);
         }
     }
 }

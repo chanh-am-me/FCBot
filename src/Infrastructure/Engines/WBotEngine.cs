@@ -24,8 +24,9 @@ public class WBotEngine : IWBotEngine
 
     private const int AppId = 22246669;
     private const string AppHash = "5077609944b128a707af34922df55028";
+    //private const string BotToken = "7428476943:AAFVt59UcYCM3lWAyj6F8CuC6SfSV1VGs20";
     private const string BotToken = "7358304134:AAEsNrhGPUSXJ9tDlKA7GgHNvNOr362-FG0";
-    private const string ForwardId = " -4538830110";
+    private const string ForwardId = "-4587788294";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
@@ -35,27 +36,16 @@ public class WBotEngine : IWBotEngine
         foreach (Message message in messages)
         {
             await Console.Out.WriteLineAsync(" Current message read: " + message.MessageId);
+            channel.ReadMessageId = message.MessageId;
             MessageType type = message.Type;
             if (type is MessageType.Unknown)
             {
-                continue;
+                return;
             }
 
-            string content = string.Empty;
-
-            if (message.Type is MessageType.Text)
-            {
-                content = message.Text ?? string.Empty;
-            }
-
-            if (message.Type is MessageType.Photo)
-            {
-                content = message.Caption ?? message.Text ?? string.Empty;
-            }
-
+            string content = message.Caption ?? message.Text ?? string.Empty;
             if (content == null || RegexExtension.SpamRegex.IsMatch(content))
             {
-                channel.ReadMessageId = message.MessageId;
                 continue;
             }
 
@@ -63,23 +53,13 @@ public class WBotEngine : IWBotEngine
             {
                 Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
                 await bot.SendTextMessage(ForwardId, "BOBO", replyParameters: forward);
-                channel.ReadMessageId = message.MessageId;
                 continue;
             }
 
             if (IsHome(content))
             {
-                try
-                {
-                    Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
-                    await bot.SendTextMessage(ForwardId, "DEV nhà hoặc Kevin", replyParameters: forward);
-                    channel.ReadMessageId = message.MessageId;
-                }
-                catch (Exception)
-                {
-                    await teleBotEngine.ForwardBackupAsync(ForwardId, channel.Id, message.MessageId, "DEV nhà hoặc Kevin");
-                    channel.ReadMessageId = message.MessageId;
-                }
+                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
+                await bot.SendTextMessage(ForwardId, "DEV nhà hoặc Kevin", replyParameters: forward);
                 continue;
             }
 
@@ -88,8 +68,6 @@ public class WBotEngine : IWBotEngine
                 await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
             }
 
-
-            channel.ReadMessageId = message.MessageId;
         }
     }
 

@@ -13,7 +13,7 @@ public static partial class RegexExtension
     [GeneratedRegex(@"\|(\s+)?Spam(\s+#)?(\d+)?")]
     private static partial Regex SpamRg();
 
-    [GeneratedRegex("(Website|Telegram|Twitter|Discord)")]
+    [GeneratedRegex("(Website|Telegram|Twitter|Discord|(https:\\/\\/t.me+)|( https:\\/\\/x.com)|(\\.com))")]
     private static partial Regex SocialRg();
 
     [GeneratedRegex("(?<=From:\\s)[a-zA-Z0-9.]+")]
