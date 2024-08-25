@@ -1,5 +1,7 @@
 ﻿using Infrastructure.Entities;
 using Infrastructure.Extensions;
+using Infrastructure.Settings;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types.Enums;
@@ -15,18 +17,17 @@ public interface IWBotEngine
 
 public class WBotEngine : IWBotEngine
 {
-    private readonly ITeleBotEngine teleBotEngine;
-
-    public WBotEngine(ITeleBotEngine teleBotEngine)
+    private readonly TelegramSettings telegramSettings;
+    public WBotEngine(IOptions<TelegramSettings> telegramOptions)
     {
-        this.teleBotEngine = teleBotEngine;
+        telegramSettings = telegramOptions.Value;
     }
 
     private const int AppId = 22246669;
     private const string AppHash = "5077609944b128a707af34922df55028";
     //private const string BotToken = "7428476943:AAFVt59UcYCM3lWAyj6F8CuC6SfSV1VGs20";
-    private const string BotToken = "7358304134:AAEsNrhGPUSXJ9tDlKA7GgHNvNOr362-FG0";
-    private const string ForwardId = "-4587788294";
+    private const string BotToken = "6401100360:AAGbOLxtw7o_HxQPjnYgMP-x_v5luG4bvTc";
+    private const string ForwardId = "-4531896172";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
