@@ -104,7 +104,7 @@ public class WBotEngine : IWBotEngine
         }
 
         Match balance = RegexExtension.BalanceRegex.Match(content);
-        if (!balance.Success || (balance.Value != "9.99" && balance.Value != "14.99"))
+        if (!balance.Success || balance.Value.Contains(".99"))
         {
             return false;
         }

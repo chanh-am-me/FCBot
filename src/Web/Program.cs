@@ -1,6 +1,9 @@
 ﻿using Infrastructure;
+using Web.Configurations;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddConfigurations();
 
 IServiceCollection services = builder.Services;
 services.AddControllers();
