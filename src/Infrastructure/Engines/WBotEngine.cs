@@ -104,7 +104,12 @@ public class WBotEngine : IWBotEngine
         }
 
         Match balance = RegexExtension.BalanceRegex.Match(content);
-        if (!balance.Success || balance.Value.Contains(".99"))
+        if (!balance.Success || !balance.Value.Contains(".99"))
+        {
+            return false;
+        }
+
+        if (content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
