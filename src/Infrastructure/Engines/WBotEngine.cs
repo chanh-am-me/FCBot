@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Entities;
 using Infrastructure.Extensions;
+using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -18,21 +19,19 @@ public interface IWBotEngine
 public class WBotEngine : IWBotEngine
 {
     private readonly TelegramSettings telegramSettings;
-    public WBotEngine(IOptions<TelegramSettings> telegramOptions)
+    private readonly DatabaseSettings databaseSettings;
+    public WBotEngine(IOptions<TelegramSettings> telegramOptions, IOptions<DatabaseSettings> databaseOptions)
     {
         telegramSettings = telegramOptions.Value;
+        databaseSettings = databaseOptions.Value;
     }
 
-    private const int AppId = 22246669;
-    private const string AppHash = "5077609944b128a707af34922df55028";
-    //private const string BotToken = "7428476943:AAFVt59UcYCM3lWAyj6F8CuC6SfSV1VGs20";
-    private const string BotToken = "7358304134:AAEsNrhGPUSXJ9tDlKA7GgHNvNOr362-FG0";
-    private const string ForwardId = "-4587788294";
+    private const string ForwardId = "-4531896172";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
-        using NpgsqlConnection connection = new(@"Host=localhost;Port=5432;Database=telegram-bot;Username=postgres;Password=1;Include Error Detail=true;");
-        using Bot bot = new(BotToken, AppId, AppHash, connection);
+        using NpgsqlConnection connection = new(databaseSettings.ConnectionString);
+        using Bot bot = new(telegramSettings.BotToken, telegramSettings.AppId, telegramSettings.AppHash, connection);
         List<Message> messages = await bot.GetMessagesById(channel.Id, Enumerable.Range(channel.ReadMessageId, 10));
         foreach (Message message in messages)
         {

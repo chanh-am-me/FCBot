@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Engines;
 using Infrastructure.HostedServices;
+using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,8 @@ public static class Startup
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         => services
-        .AddEngine()
+        .AddPersistent()
         .AddSettings()
+        .AddEngine()
         .AddBackgroundService();
 }
