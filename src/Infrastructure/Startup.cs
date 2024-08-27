@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Engines;
 using Infrastructure.HostedServices;
-using Infrastructure.Persistent;
+using Infrastructure.Persistents;
 using Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 

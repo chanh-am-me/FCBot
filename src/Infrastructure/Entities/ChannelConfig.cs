@@ -13,11 +13,7 @@ public class ChannelConfig
         return new()
         {
             Id = "@DRBTSolana",
-<<<<<<< Updated upstream
-            ReadMessageId = 498951,
-=======
             ReadMessageId = 499734,
->>>>>>> Stashed changes
         };
     }
 }

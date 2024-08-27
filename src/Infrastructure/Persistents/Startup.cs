@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Infrastructure.Persistents.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Infrastructure.Persistent;
+namespace Infrastructure.Persistents;
 
 internal static class Startup
 {
@@ -12,6 +13,8 @@ internal static class Startup
         .AddOptions<DatabaseSettings>()
         .BindConfiguration(nameof(DatabaseSettings))
         .ValidateOnStart();
+
+        services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
         return services.AddDbContext();
     }

@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Entities;
-using Infrastructure.Persistent;
+using Infrastructure.Persistents;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using Npgsql;

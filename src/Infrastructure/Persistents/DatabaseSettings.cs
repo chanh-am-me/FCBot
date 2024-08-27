@@ -1,7 +1,7 @@
 ﻿using Infrastructure.Extensions;
 using System.ComponentModel.DataAnnotations;
 
-namespace Infrastructure.Persistent;
+namespace Infrastructure.Persistents;
 
 public class DatabaseSettings : IValidatableObject
 {

@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 
-namespace Infrastructure.Persistent.Repositories;
+namespace Infrastructure.Persistents.Repositories;
 
 public interface IRepositoryBase<TEntity>
     where TEntity : class, new()
@@ -18,15 +19,16 @@ public interface IRepositoryBase<TEntity>
 
     Task<IEnumerable<TEntity>> DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
-    IQueryable<TEntity> Find(Expression<Func<TEntity, bool>>? predicate = default, CancellationToken cancellationToken = default);
+    IQueryable<TEntity> Find(Expression<Func<TEntity, bool>>? predicate = default, bool isASNoTracking = false, CancellationToken cancellationToken = default);
 }
 
 public class RepositoryBase<TEntity>(ApplicationDbContext context) : IRepositoryBase<TEntity>
     where TEntity : class, new()
 {
-    public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
+    public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>>? predicate = null, bool isAsNoTracking = false, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        IQueryable<TEntity> query = context.Set<TEntity>().Where(predicate ?? (_ => true));
+        return isAsNoTracking ? query.AsNoTracking() : query;
     }
 
     public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
