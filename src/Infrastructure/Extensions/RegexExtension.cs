@@ -9,6 +9,7 @@ public static partial class RegexExtension
     public static readonly Regex FromRegex = FromRg();
     public static readonly Regex SupplyRegex = SupplyRg();
     public static readonly Regex BalanceRegex = BalanceRg();
+    public static readonly Regex XX99BalanceRegex = XX99BalanceRg();
 
     [GeneratedRegex(@"\|(\s+)?Spam(\s+#)?(\d+)?")]
     private static partial Regex SpamRg();
@@ -22,6 +23,9 @@ public static partial class RegexExtension
     [GeneratedRegex("(?<=Supply:\\s)[a-zA-Z0-9.,]+")]
     private static partial Regex SupplyRg();
 
-    [GeneratedRegex("(?<=Balance:\\s)[a-zA-Z0-9.,]+")]
+    [GeneratedRegex("(?<=Balance:\\s)[0-9.,]+")]
     private static partial Regex BalanceRg();
+
+    [GeneratedRegex("^\\d{1,2}\\.99$")]
+    private static partial Regex XX99BalanceRg();
 }

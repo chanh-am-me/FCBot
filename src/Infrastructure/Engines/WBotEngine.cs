@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Entities;
-using Infrastructure.Extensions;
+using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types.Enums;
 using WTelegram;
 using WTelegram.Types;
+using static Infrastructure.Extensions.RegexExtension;
 
 namespace Infrastructure.Engines;
 
@@ -18,21 +19,19 @@ public interface IWBotEngine
 public class WBotEngine : IWBotEngine
 {
     private readonly TelegramSettings telegramSettings;
-    public WBotEngine(IOptions<TelegramSettings> telegramOptions)
+    private readonly DatabaseSettings databaseSettings;
+    public WBotEngine(IOptions<TelegramSettings> telegramOptions, IOptions<DatabaseSettings> databaseOptions)
     {
         telegramSettings = telegramOptions.Value;
+        databaseSettings = databaseOptions.Value;
     }
 
-    private const int AppId = 22246669;
-    private const string AppHash = "5077609944b128a707af34922df55028";
-    //private const string BotToken = "7428476943:AAFVt59UcYCM3lWAyj6F8CuC6SfSV1VGs20";
-    private const string BotToken = "7358304134:AAEsNrhGPUSXJ9tDlKA7GgHNvNOr362-FG0";
-    private const string ForwardId = "-4587788294";
+    private const string ForwardId = "-4531896172";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
-        using NpgsqlConnection connection = new(@"Host=localhost;Port=5432;Database=telegram-bot;Username=postgres;Password=1;Include Error Detail=true;");
-        using Bot bot = new(BotToken, AppId, AppHash, connection);
+        using NpgsqlConnection connection = new(databaseSettings.ConnectionString);
+        using Bot bot = new(telegramSettings.BotToken, telegramSettings.AppId, telegramSettings.AppHash, connection);
         List<Message> messages = await bot.GetMessagesById(channel.Id, Enumerable.Range(channel.ReadMessageId, 10));
         foreach (Message message in messages)
         {
@@ -45,7 +44,7 @@ public class WBotEngine : IWBotEngine
             }
 
             string content = message.Caption ?? message.Text ?? string.Empty;
-            if (content == null || RegexExtension.SpamRegex.IsMatch(content))
+            if (content == null || SpamRegex.IsMatch(content))
             {
                 continue;
             }
@@ -64,7 +63,7 @@ public class WBotEngine : IWBotEngine
                 continue;
             }
 
-            if (RegexExtension.SocialRegex.IsMatch(content))
+            if (SocialRegex.IsMatch(content))
             {
                 await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
             }
@@ -72,14 +71,14 @@ public class WBotEngine : IWBotEngine
         }
     }
 
-    private static bool IsBobo(string content)
+    public static bool IsBobo(string content)
     {
         if (string.IsNullOrEmpty(content))
         {
             return false;
         }
 
-        Match owner = RegexExtension.FromRegex.Match(content);
+        Match owner = FromRegex.Match(content);
         if (!owner.Success)
         {
             return false;
@@ -89,27 +88,34 @@ public class WBotEngine : IWBotEngine
         return walletOwner.StartsWith("5n") && walletOwner.EndsWith("EPs");
     }
 
-    private static bool IsHome(string content)
+    public static bool IsHome(string content)
     {
         if (string.IsNullOrEmpty(content))
         {
             return false;
         }
 
-        Match supply = RegexExtension.SupplyRegex.Match(content);
+        Match supply = SupplyRegex.Match(content);
 
         if (!supply.Success || supply.Value != "1,000,000,000")
         {
             return false;
         }
 
-        Match balance = RegexExtension.BalanceRegex.Match(content);
-        if (!balance.Success || !balance.Value.Contains(".99"))
+        Match balance = BalanceRegex.Match(content);
+        if (!balance.Success || !XX99BalanceRegex.IsMatch(balance.Value))
         {
             return false;
         }
 
         if (content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value))
         {
             return false;
         }

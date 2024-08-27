@@ -1,11 +1,12 @@
 ﻿namespace Web.Configurations;
 
-internal static class Configuration
+internal static class Startup
 {
     internal static IConfigurationBuilder AddConfigurations(this IConfigurationBuilder configurationBuilder)
     {
         configurationBuilder
             .AddJsonFiles("appsettings")
+            .AddJsonFiles("database")
             .Build();
         return configurationBuilder;
     }

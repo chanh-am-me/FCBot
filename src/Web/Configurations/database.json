@@ -1,0 +1,5 @@
+{
+  "DatabaseSettings": {
+    "ConnectionString": "Host=localhost;Port=5432;Database=telegram-bot-debug;Username=postgres;Password=1;Include Error Detail=true;"
+  }
+}

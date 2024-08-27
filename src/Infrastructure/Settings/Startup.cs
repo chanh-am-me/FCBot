@@ -8,7 +8,8 @@ internal static class Startup
     {
         services
         .AddOptions<TelegramSettings>()
-        .BindConfiguration(nameof(TelegramSettings));
+        .BindConfiguration(nameof(TelegramSettings))
+        .ValidateOnStart();
 
         return services;
     }
