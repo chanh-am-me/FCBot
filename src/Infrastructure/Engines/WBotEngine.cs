@@ -1,5 +1,4 @@
 ﻿using Infrastructure.Entities;
-using Infrastructure.Extensions;
 using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
@@ -8,6 +7,7 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types.Enums;
 using WTelegram;
 using WTelegram.Types;
+using static Infrastructure.Extensions.RegexExtension;
 
 namespace Infrastructure.Engines;
 
@@ -44,7 +44,7 @@ public class WBotEngine : IWBotEngine
             }
 
             string content = message.Caption ?? message.Text ?? string.Empty;
-            if (content == null || RegexExtension.SpamRegex.IsMatch(content))
+            if (content == null || SpamRegex.IsMatch(content))
             {
                 continue;
             }
@@ -63,7 +63,7 @@ public class WBotEngine : IWBotEngine
                 continue;
             }
 
-            if (RegexExtension.SocialRegex.IsMatch(content))
+            if (SocialRegex.IsMatch(content))
             {
                 await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
             }
@@ -71,14 +71,14 @@ public class WBotEngine : IWBotEngine
         }
     }
 
-    private static bool IsBobo(string content)
+    public static bool IsBobo(string content)
     {
         if (string.IsNullOrEmpty(content))
         {
             return false;
         }
 
-        Match owner = RegexExtension.FromRegex.Match(content);
+        Match owner = FromRegex.Match(content);
         if (!owner.Success)
         {
             return false;
@@ -88,27 +88,34 @@ public class WBotEngine : IWBotEngine
         return walletOwner.StartsWith("5n") && walletOwner.EndsWith("EPs");
     }
 
-    private static bool IsHome(string content)
+    public static bool IsHome(string content)
     {
         if (string.IsNullOrEmpty(content))
         {
             return false;
         }
 
-        Match supply = RegexExtension.SupplyRegex.Match(content);
+        Match supply = SupplyRegex.Match(content);
 
         if (!supply.Success || supply.Value != "1,000,000,000")
         {
             return false;
         }
 
-        Match balance = RegexExtension.BalanceRegex.Match(content);
-        if (!balance.Success || !balance.Value.Contains(".99"))
+        Match balance = BalanceRegex.Match(content);
+        if (!balance.Success || !XX99BalanceRegex.IsMatch(balance.Value))
         {
             return false;
         }
 
         if (content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value))
         {
             return false;
         }

@@ -10,6 +10,8 @@ public class ReadMessagesHostedService(IServiceScopeFactory serviceScopeFactory)
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        //ReceiveMessages();
+        //return;
         IWBotEngine engine = serviceScopeFactory.GetService<IWBotEngine>();
         ChannelConfig channel = ChannelConfig.Default;
         while (!stoppingToken.IsCancellationRequested)
