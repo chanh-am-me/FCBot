@@ -1,4 +1,5 @@
-﻿using Infrastructure.Entities;
+﻿using Infrastructure.Definations;
+using Infrastructure.Entities;
 using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
@@ -63,6 +64,12 @@ public class WBotEngine : IWBotEngine
                 continue;
             }
 
+            if (IsCoinBase(content))
+            {
+                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
+                await bot.SendTextMessage(ForwardId, HtmlMessages.Coinbase, ParseMode.Html, replyParameters: forward);
+            }
+
             if (SocialRegex.IsMatch(content))
             {
                 await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
@@ -116,6 +123,63 @@ public class WBotEngine : IWBotEngine
         Match from = FromRegex.Match(content);
 
         if (!from.Success || string.IsNullOrEmpty(from.Value))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsCoinBase(string content)
+    {
+        if (string.IsNullOrEmpty(content))
+        {
+            return false;
+        }
+
+        Match supply = SupplyRegex.Match(content);
+
+        if (!supply.Success || supply.Value != "1,000,000,000")
+        {
+            return false;
+        }
+
+        Match balance = BalanceRegex.Match(content);
+
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value) || !from.Value.Contains("Coinbase"))
+        {
+            return false;
+        }
+
+        if (!content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        Match twitterHashLink = TwitterHasLinkRegex.Match(content);
+
+        if (!twitterHashLink.Success || string.IsNullOrEmpty(twitterHashLink.Value))
+        {
+            return false;
+        }
+
+        Match teleHashLink = TeleHasLinkRegex.Match(content);
+
+        if (!teleHashLink.Success || string.IsNullOrEmpty(teleHashLink.Value))
+        {
+            return false;
+        }
+
+        Match websiteHashLink = WebsiteRegex.Match(content);
+
+        if (!websiteHashLink.Success || string.IsNullOrEmpty(websiteHashLink.Value))
         {
             return false;
         }

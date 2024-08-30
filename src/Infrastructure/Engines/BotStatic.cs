@@ -1,7 +1,10 @@
-﻿using Infrastructure.Extensions;
+﻿using Infrastructure.Definations;
+using Infrastructure.Extensions;
+using Npgsql;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using WTelegram;
 using static Infrastructure.Engines.WBotEngine;
 
 namespace Infrastructure.Engines;
@@ -39,6 +42,15 @@ public static class BotStatic
             await bot.SendTextMessageAsync(msg.Chat, "Dev nhà hoặc kevin", replyParameters: msg);
             return;
         }
+
+        if (IsCoinBase(content))
+        {
+            using NpgsqlConnection connection = new("Host=localhost;Port=5432;Database=telegram-bot-debug;Username=postgres;Password=1;Include Error Detail=true;");
+            using Bot client = new(BotToken, 22246669, "5077609944b128a707af34922df55028", connection);
+            await client.SendTextMessage(msg.Chat, HtmlMessages.Coinbase, ParseMode.Html, replyParameters: msg);
+            return;
+        }
+
 
         if (content == null || RegexExtension.SpamRegex.IsMatch(content))
         {
