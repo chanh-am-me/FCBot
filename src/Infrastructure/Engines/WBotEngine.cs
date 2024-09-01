@@ -86,13 +86,17 @@ public class WBotEngine : IWBotEngine
         }
 
         Match owner = FromRegex.Match(content);
-        if (!owner.Success)
+        if (!owner.Success || !owner.Value.StartsWith("5n") || !owner.Value.EndsWith("EPs"))
         {
             return false;
         }
 
-        string walletOwner = owner.Value;
-        return walletOwner.StartsWith("5n") && walletOwner.EndsWith("EPs");
+        if (!SocialRegex.IsMatch(content))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public static bool IsHome(string content)
