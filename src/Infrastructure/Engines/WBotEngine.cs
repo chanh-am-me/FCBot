@@ -70,6 +70,12 @@ public class WBotEngine : IWBotEngine
                 await bot.SendTextMessage(ForwardId, HtmlMessages.Coinbase, ParseMode.Html, replyParameters: forward);
             }
 
+            if (IsCrazy(content))
+            {
+                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
+                await bot.SendTextMessage(ForwardId, HtmlMessages.Crazy, ParseMode.Html, replyParameters: forward);
+            }
+
             if (SocialRegex.IsMatch(content))
             {
                 await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
@@ -184,6 +190,43 @@ public class WBotEngine : IWBotEngine
         Match websiteHashLink = WebsiteRegex.Match(content);
 
         if (!websiteHashLink.Success || string.IsNullOrEmpty(websiteHashLink.Value))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsCrazy(string content)
+    {
+
+        if (string.IsNullOrEmpty(content))
+        {
+            return false;
+        }
+
+        Match supply = SupplyRegex.Match(content);
+
+        if (!supply.Success || supply.Value != "42,000,000,000,000,000")
+        {
+            return false;
+        }
+
+        Match balance = BalanceRegex.Match(content);
+
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value) || !balance.Value.Contains("50"))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value) || !from.Value.Contains("Kucoin", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
