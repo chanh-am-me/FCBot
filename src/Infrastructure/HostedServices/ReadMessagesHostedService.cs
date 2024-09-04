@@ -1,5 +1,4 @@
 ﻿using Infrastructure.Engines;
-using Infrastructure.Entities;
 using Infrastructure.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,12 +12,12 @@ public class ReadMessagesHostedService(IServiceScopeFactory serviceScopeFactory)
         //ReceiveMessages();
         //return;
         IWBotEngine engine = serviceScopeFactory.GetService<IWBotEngine>();
-        ChannelConfig channel = ChannelConfig.Default;
+        //ChannelConfig channel = ChannelConfig.Default;
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await engine.ReadLastedMessagesAsync(channel);
+                //await engine.ReadLastedMessagesAsync(channel);
             }
             catch (Exception ex)
             {

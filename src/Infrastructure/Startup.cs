@@ -1,5 +1,5 @@
-﻿using Infrastructure.Engines;
-using Infrastructure.HostedServices;
+﻿using Infrastructure.Channels;
+using Infrastructure.Engines;
 using Infrastructure.Persistents;
 using Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,5 +13,6 @@ public static class Startup
         .AddPersistent()
         .AddSettings()
         .AddEngine()
-        .AddBackgroundService();
+        .AddModule();
+    //.AddBackgroundService();
 }

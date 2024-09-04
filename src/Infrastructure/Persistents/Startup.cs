@@ -15,6 +15,7 @@ internal static class Startup
         .ValidateOnStart();
 
         services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 
         return services.AddDbContext();
     }
