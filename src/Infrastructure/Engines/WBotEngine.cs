@@ -27,7 +27,7 @@ public class WBotEngine : IWBotEngine
         databaseSettings = databaseOptions.Value;
     }
 
-    private const string ForwardId = "-4531896172";
+    private const string ForwardId = "-4587788294";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
@@ -207,14 +207,14 @@ public class WBotEngine : IWBotEngine
 
         Match supply = SupplyRegex.Match(content);
 
-        if (!supply.Success || supply.Value != "42,000,000,000,000,000")
+        if (!supply.Success || !supply.Value.Contains("42,000,000,000,000"))
         {
             return false;
         }
 
         Match balance = BalanceRegex.Match(content);
 
-        if (!balance.Success || string.IsNullOrEmpty(balance.Value) || !balance.Value.Contains("50"))
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value) || !balance.Value.Contains("50") || !balance.Value.Contains("50"))
         {
             return false;
         }
