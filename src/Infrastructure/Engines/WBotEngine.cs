@@ -22,7 +22,7 @@ public class WBotEngine : IWBotEngine
         databaseSettings = databaseOptions.Value;
     }
 
-    private const string ForwardId = "-4531896172";
+    private const string ForwardId = "-4587788294";
 
     public async Task ReadLastedMessagesAsync(ChannelConfig channel)
     {
@@ -59,10 +59,23 @@ public class WBotEngine : IWBotEngine
         //        continue;
         //    }
 
-        //    if (SocialRegex.IsMatch(content))
-        //    {
-        //        await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
-        //    }
+        // if (IsCoinBase(content))
+        // {
+        //     Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
+        //     await bot.SendTextMessage(ForwardId, HtmlMessages.Coinbase, ParseMode.Html, replyParameters: forward);
+        // }
+
+        // if (IsCrazy(content))
+        // {
+        //     Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
+        //     await bot.SendTextMessage(ForwardId, HtmlMessages.Crazy, ParseMode.Html, replyParameters: forward);
+        // }
+
+        // if (SocialRegex.IsMatch(content))
+        // {
+        //     await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
+        // }
+
         //}
     }
 
@@ -74,13 +87,17 @@ public class WBotEngine : IWBotEngine
         }
 
         Match owner = FromRegex.Match(content);
-        if (!owner.Success)
+        if (!owner.Success || !owner.Value.StartsWith("5n") || !owner.Value.EndsWith("EPs"))
         {
             return false;
         }
 
-        string walletOwner = owner.Value;
-        return walletOwner.StartsWith("5n") && walletOwner.EndsWith("EPs");
+        if (!SocialRegex.IsMatch(content))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public static bool IsHome(string content)
@@ -111,6 +128,100 @@ public class WBotEngine : IWBotEngine
         Match from = FromRegex.Match(content);
 
         if (!from.Success || string.IsNullOrEmpty(from.Value))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsCoinBase(string content)
+    {
+        if (string.IsNullOrEmpty(content))
+        {
+            return false;
+        }
+
+        Match supply = SupplyRegex.Match(content);
+
+        if (!supply.Success || supply.Value != "1,000,000,000")
+        {
+            return false;
+        }
+
+        Match balance = BalanceRegex.Match(content);
+
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value) || !from.Value.Contains("Coinbase"))
+        {
+            return false;
+        }
+
+        if (!content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        Match twitterHashLink = TwitterHasLinkRegex.Match(content);
+
+        if (!twitterHashLink.Success || string.IsNullOrEmpty(twitterHashLink.Value))
+        {
+            return false;
+        }
+
+        Match teleHashLink = TeleHasLinkRegex.Match(content);
+
+        if (!teleHashLink.Success || string.IsNullOrEmpty(teleHashLink.Value))
+        {
+            return false;
+        }
+
+        Match websiteHashLink = WebsiteRegex.Match(content);
+
+        if (!websiteHashLink.Success || string.IsNullOrEmpty(websiteHashLink.Value))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsCrazy(string content)
+    {
+
+        if (string.IsNullOrEmpty(content))
+        {
+            return false;
+        }
+
+        Match supply = SupplyRegex.Match(content);
+
+        if (!supply.Success || !supply.Value.Contains("42,000,000,000,000"))
+        {
+            return false;
+        }
+
+        Match balance = BalanceRegex.Match(content);
+
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value) || !balance.Value.Contains("50") || !balance.Value.Contains("50"))
+        {
+            return false;
+        }
+
+        Match from = FromRegex.Match(content);
+
+        if (!from.Success || string.IsNullOrEmpty(from.Value) || !from.Value.Contains("Kucoin", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (content.Contains("Description:", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
