@@ -207,14 +207,14 @@ public class WBotEngine : IWBotEngine
 
         Match supply = SupplyRegex.Match(content);
 
-        if (!supply.Success || !supply.Value.Contains("42,000,000,000,000"))
+        if (!supply.Success || !supply.Value.Contains("000,000,000,000"))
         {
             return false;
         }
 
         Match balance = BalanceRegex.Match(content);
 
-        if (!balance.Success || string.IsNullOrEmpty(balance.Value) || !balance.Value.Contains("50") || !balance.Value.Contains("50"))
+        if (!balance.Success || string.IsNullOrEmpty(balance.Value) /*|| (!balance.Value.Contains("50") && !balance.Value.Contains("60"))*/)
         {
             return false;
         }

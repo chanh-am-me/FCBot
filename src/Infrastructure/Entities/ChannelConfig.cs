@@ -13,7 +13,7 @@ public class ChannelConfig
         return new()
         {
             Id = "@DRBTSolana",
-            ReadMessageId = 504699,
+            ReadMessageId = 508357,
         };
     }
 }
