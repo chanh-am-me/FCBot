@@ -5,6 +5,9 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["FCBot.sln", "./"]
+COPY ["src/Web/Web.csproj", "src/Web"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure"]
+COPY ["src/Migration.Postgres/Migration.Postgres.csproj", "src/Migration.Postgres"]
 RUN dotnet restore "./FCBot.sln"
 COPY . .
 WORKDIR "/src/src/Web"
