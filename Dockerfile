@@ -8,9 +8,9 @@ COPY ["FCBot.sln", "./"]
 COPY ["src/Web/Web.csproj", "src/Web"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure"]
 COPY ["src/Migration.Postgres/Migration.Postgres.csproj", "src/Migration.Postgres"]
-RUN dotnet restore "./FCBot.sln"
+RUN dotnet restore
 COPY . .
-WORKDIR "/src/src/Web"
+WORKDIR "/src/"
 RUN dotnet build "Web.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "Web.csproj" -c Release -o /app/publish
