@@ -8,9 +8,9 @@ COPY ["src/Web/Web.csproj", "./"]
 RUN dotnet restore "./Web.csproj"
 COPY . .
 WORKDIR "/src/"
-RUN dotnet build "src/Web/Web.csproj" -c Release -o /app/build
+RUN dotnet build "Web.csproj" -c Release -o /app/build
 FROM build AS publish
-RUN dotnet publish "src/Web/Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "Web.csproj" -c Release -o /app/publish
 # Build the final image using the base image and the published output
 FROM base AS final
 WORKDIR /app
