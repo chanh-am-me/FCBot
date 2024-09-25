@@ -8,6 +8,7 @@ COPY ["FCBot.sln", "./"]
 COPY ["src/Web/Web.csproj", "src/Web/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 COPY ["src/Migration.Postgres/Migration.Postgres.csproj", "src/Migration.Postgres/"]
+RUN dotnet nuget add source "https://pkgs.dev.azure.com/tgbots/Telegram.Bot/_packaging/release/nuget/v3/index.json" -n Telegram.Bot
 RUN dotnet restore "./FCBot.sln"
 COPY . .
 WORKDIR "/src/"
