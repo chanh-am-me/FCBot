@@ -1,5 +1,6 @@
 {
   "DatabaseSettings": {
-    "ConnectionString": "Host=14.225.204.67;Port=5432;Database=fcbot;Username=postgres;Password=Chanh@0101;Include Error Detail=true;"
+    "ConnectionString": "Host=localhost;Port=5432;Database=fcbot;Username=postgres;Password=1;Include Error Detail=true;"
+    //"ConnectionString": "Host=14.225.204.67;Port=5432;Database=fcbot;Username=postgres;Password=Chanh@0101;Include Error Detail=true;"
   }
 }

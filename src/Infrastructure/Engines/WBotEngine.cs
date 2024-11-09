@@ -1,9 +1,7 @@
 ﻿using Infrastructure.Definations;
 using Infrastructure.Entities;
-using Infrastructure.Persistent;
 using Infrastructure.Settings;
 using Microsoft.Extensions.Options;
-using Npgsql;
 using System.Text.RegularExpressions;
 using Telegram.Bot.Types.Enums;
 using WTelegram;
@@ -14,25 +12,15 @@ namespace Infrastructure.Engines;
 
 public interface IWBotEngine
 {
-    Task ReadLastedMessagesAsync(ChannelConfig channel);
+    Task ReadLastedMessagesAsync(Bot bot, ChannelConfig channel);
 }
 
-public class WBotEngine : IWBotEngine
+public class WBotEngine(IOptions<TelegramSettings> telegramOptions) : IWBotEngine
 {
-    private readonly TelegramSettings telegramSettings;
-    private readonly DatabaseSettings databaseSettings;
-    public WBotEngine(IOptions<TelegramSettings> telegramOptions, IOptions<DatabaseSettings> databaseOptions)
-    {
-        telegramSettings = telegramOptions.Value;
-        databaseSettings = databaseOptions.Value;
-    }
+    private readonly TelegramSettings telegramSettings = telegramOptions.Value;
 
-    private const string ForwardId = "-4587788294";
-
-    public async Task ReadLastedMessagesAsync(ChannelConfig channel)
+    public async Task ReadLastedMessagesAsync(Bot bot, ChannelConfig channel)
     {
-        using NpgsqlConnection connection = new(databaseSettings.ConnectionString);
-        using Bot bot = new(telegramSettings.BotToken, telegramSettings.AppId, telegramSettings.AppHash, connection);
         List<Message> messages = await bot.GetMessagesById(channel.Id, Enumerable.Range(channel.ReadMessageId, 10));
         foreach (Message message in messages)
         {
@@ -52,35 +40,62 @@ public class WBotEngine : IWBotEngine
 
             if (IsBobo(content))
             {
-                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
-                await bot.SendTextMessage(ForwardId, "BOBO", replyParameters: forward);
+                IEnumerable<(Message Message, string ForwardId)> forwards = await ForwardsAsync(bot, channel.Id, message.MessageId);
+                await SendTextAsync(bot, forwards, "BOBO", false);
                 continue;
             }
 
             if (IsHome(content))
             {
-                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
-                await bot.SendTextMessage(ForwardId, "DEV nhà hoặc Kevin", replyParameters: forward);
+                IEnumerable<(Message Message, string ForwardId)> forwards = await ForwardsAsync(bot, channel.Id, message.MessageId);
+                await SendTextAsync(bot, forwards, "DEV nhà hoặc Kevin", false);
                 continue;
             }
 
             if (IsCoinBase(content))
             {
-                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
-                await bot.SendTextMessage(ForwardId, HtmlMessages.Coinbase, ParseMode.Html, replyParameters: forward);
+                IEnumerable<(Message Message, string ForwardId)> forwards = await ForwardsAsync(bot, channel.Id, message.MessageId);
+                await SendTextAsync(bot, forwards, HtmlMessages.Coinbase, true);
+                continue;
             }
 
             if (IsCrazy(content))
             {
-                Message forward = await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId, message.MessageId);
-                await bot.SendTextMessage(ForwardId, HtmlMessages.Crazy, ParseMode.Html, replyParameters: forward);
+                IEnumerable<(Message Message, string ForwardId)> forwards = await ForwardsAsync(bot, channel.Id, message.MessageId);
+                await SendTextAsync(bot, forwards, HtmlMessages.Crazy, true);
+                continue;
             }
 
             if (SocialRegex.IsMatch(content))
             {
-                await bot.ForwardMessage(ForwardId, channel.Id, message.MessageId);
+                await ForwardsAsync(bot, channel.Id, message.MessageId);
             }
 
+        }
+    }
+
+    private async Task<IEnumerable<(Message Message, string ForwardId)>> ForwardsAsync(Bot bot, string channelId, int messagesId)
+    {
+        List<(Message Message, string ForwardId)> messages = [];
+        foreach (string forwardId in telegramSettings.ForwardIds)
+        {
+            messages.Add((await bot.ForwardMessage(forwardId, channelId, messagesId, messagesId), forwardId));
+        }
+
+        return messages;
+    }
+
+    private static async Task SendTextAsync(Bot bot, IEnumerable<(Message Message, string ForwardId)> messages, string text, bool isHtml)
+    {
+        foreach ((Message message, string forwardId) in messages)
+        {
+            if (isHtml)
+            {
+                await bot.SendTextMessage(forwardId, text, ParseMode.Html, replyParameters: message);
+                continue;
+            }
+
+            await bot.SendTextMessage(forwardId, text, replyParameters: message);
         }
     }
 

@@ -11,6 +11,8 @@ public class TelegramSettings : IValidatableObject
 
     public string BotToken { get; set; } = default!;
 
+    public List<string> ForwardIds { get; set; } = default;
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         => validationContext.Required();
 }
